@@ -1,7 +1,15 @@
 library(mvtnorm)
-library(Matrix)
+#' Title
+#'
+#' @param lmat
+#'
+#' @return
+#' @export
+#' @import Matrix
+#' @examples
 bdiag_m <- function(lmat) {
   ## Copyright (C) 2016 Martin Maechler, ETH Zurich
+  library(Matrix)
   if(!length(lmat)) return(new("dgCMatrix"))
   stopifnot(is.list(lmat), is.matrix(lmat[[1]]),
             (k <- (d <- dim(lmat[[1]]))[1]) == d[2], # k x k
@@ -18,19 +26,26 @@ bdiag_m <- function(lmat) {
       x = as.double(unlist(lmat, recursive=FALSE, use.names=FALSE)))
 }
 
-#------------------------------------- option 1
-GenZ1 = function(SIGMA){
-Z = lapply(1:nblock, function(i) {
-  mvtnorm::rmvnorm(1,  sigma = SIGMA[[i]] )
-}) %>% unlist()
-}
-
 #------------------------------------- option 2
+#' Title
+#'
+#' @param SIGMA.SQRT
+#'
+#' @return
+#' @export
+#'
+#' @examples
 GenZ2 = function(SIGMA.SQRT){
 Z = SIGMA.SQRT %*% rnorm(dim(SIGMA.SQRT)[1] ) %>% as.vector()
 }
-#------------------------------------ Distribution function of |Z| under the null
-# ----------------------------------- the ouput is p value 
+#'  Distribution function of |Z| under the null
+#'
+#' @param SIGMA.SQRT
+#'
+#' @return
+#' @export
+#'
+#' @examples
 F.null.Z = function(SIGMA.SQRT){
   Z = SIGMA.SQRT %*% rnorm(dim(SIGMA.SQRT)[1] ) %>% as.vector()
   p.z = 2*(1 - pnorm( abs(z)))
