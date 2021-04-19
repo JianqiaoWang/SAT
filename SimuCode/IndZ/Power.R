@@ -8,6 +8,7 @@ for(d1 in c(10, 50, 100) ){
   for(d2 in c(10, 50, 100)){
     for( a  in c(3,4) ){
       for(b in c(4,5 )){
+mu.1 = rep(0, p); mu.2 = rep(0, p);
 X <- c(rep(0,p-(d1 + d2 + d3)),rep(1,d1),rep(2,d2),rep(3,d3));
 mu.1[X==1] = rnorm(d1, a, 1)
 mu.2[X==2] = rnorm(d2, b, 1)

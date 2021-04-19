@@ -21,6 +21,7 @@ for(d1 in c(10, 50, 100) ){
     for(d3 in c(10, 50, 100)){
     for( a  in c(4) ){
       for(b in c(4 )){
+        mu.1 = rep(0, p); mu.2 = rep(0, p);
       X <- c(rep(0,p-(d1 + d2 + d3)),
              rep(1,d1),rep(2,d2),rep(3,d3));
       I.null = which(X != 3)
