@@ -43,4 +43,4 @@ colnames(res) = c("d1", "d2", "a", "b", "SAT", "SSA", "10^(-2)", "10^(-3)",
                   "10^(-4)", "10^(-5)")
 save(res, file = "simu1.power.Rdata")
 res[,-c(1:4)] = 100 * res[,-c(1:4)]
-knitr::kable(res, format = "latex", digits = 1, booktab = T)
+knitr::kable(res[,-c(1:4,7)], format = "latex", digits = 1, booktab = T)
