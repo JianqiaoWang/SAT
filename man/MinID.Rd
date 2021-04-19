@@ -13,6 +13,9 @@ MinID(P1, P2, K = 200, F.null = NULL, type, alpha)
 
 \item{alpha}{error rate level}
 }
+\value{
+
+}
 \description{
 Identification of sharing association
 }

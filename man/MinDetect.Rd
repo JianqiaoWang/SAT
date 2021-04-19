@@ -15,6 +15,9 @@ MinDetect(P1, P2, K = 200, F.null = NULL)
 
 \item{F.null}{}
 }
+\value{
+
+}
 \description{
 Detect function
 }

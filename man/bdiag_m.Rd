@@ -9,6 +9,9 @@ bdiag_m(lmat)
 \arguments{
 \item{lmat}{}
 }
+\value{
+
+}
 \description{
 Title
 }

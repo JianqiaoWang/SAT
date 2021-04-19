@@ -9,6 +9,9 @@ F.null.Z(SIGMA.SQRT)
 \arguments{
 \item{SIGMA.SQRT}{}
 }
+\value{
+
+}
 \description{
 Distribution function of |Z| under the null
 }

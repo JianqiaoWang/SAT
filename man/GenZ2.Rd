@@ -9,6 +9,9 @@ GenZ2(SIGMA.SQRT)
 \arguments{
 \item{SIGMA.SQRT}{}
 }
+\value{
+
+}
 \description{
 Title
 }
