@@ -16,8 +16,8 @@ bunch_of_tests <- function(S, I.null){
   return(c(FWE, FDP, TPP))
 }
 
-for(d1 in c(10, 50, 100) ){
-  for(d2 in c(10, 50, 100)){
+for(d1 in c(50, 100) ){
+  for(d2 in c(50, 100)){
     for(d3 in c(10, 50, 100)){
     for( a  in c(4) ){
       for(b in c(4 )){

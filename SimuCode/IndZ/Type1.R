@@ -40,5 +40,9 @@ res = rbind(res, c(d1, d2, a, b,
 
 }}}}
 res = as.data.frame(res)
-colnames(res) = c("d1", "d2", "a", "b", "SAT", "SSA")
+colnames(res) = c("d1", "d2", "a", "b", "SAT", "SSA", "10^(-2)", "10^(-3)",
+"10^(-4)", "10^(-5)")
 save(res, file = "res.simu1.null.Rdata")
+res[,-c(1:4)] = 100 * res[,-c(1:4)]
+knitr::kable(res[,-7], format = "latex", digits = 1, booktab = T)
+
