@@ -31,7 +31,7 @@ MinID = function(P1, P2, K = 200, F.null = NULL, type, alpha){
 
     if(type == "FWER"){  # minimum p value
       t.choice = sort(unique(P.max), decreasing = FALSE)[1:1000]
-      if(CF(Tstat)){return(list(S = 0, tau = 0))}else{
+      if(CF(Tstat) > alpha ){return(list(S = 0, tau = 0))}else{
         tau = min(t.choice[CF(t.choice) <= alpha])
         S =  which(P.max <= tau)
       return(list(S = S, tau = tau))
