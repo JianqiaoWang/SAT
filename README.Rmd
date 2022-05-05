@@ -50,7 +50,7 @@ Z1 <- mu.1 + rnorm(p,0,1);
 Z2 <- mu.2 + rnorm(p,0,1);
 T1 = abs(Z1);T2 = abs(Z2);
 P1 = 2* (1 - pnorm( T1)); P2 = 2* (1 - pnorm(T2));
-SAT::MinDetect(P1, P2)
+MinMaxP.simu(P1, P2)
 ```
 
 
