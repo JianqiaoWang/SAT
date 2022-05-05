@@ -30,13 +30,13 @@ install.packages("SAT")
 
 And the development version from [GitHub](https://github.com/) with:
 
-``` r
+```{r}
 # install.packages("devtools")
 devtools::install_github("JianqiaoWang/SAT")
 ```
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+This is a basic example which shows you how to solve a common problem: Independent sequence
 
 ```{r example}
 library(SAT)
@@ -53,18 +53,11 @@ P1 = 2* (1 - pnorm( T1)); P2 = 2* (1 - pnorm(T2));
 SAT::MinDetect(P1, P2)
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
 
-```{r cars}
-summary(cars)
+For the typical genetic applications, we consider the LD between the sequences. It requires the additional information of the external LD matrix.  
+
+```{r, eval = F}
+pvalue =  SAT::MinMaxP.geno(sumstat.comb$P.gwas, sumstat.comb$P.gtex, ref.geno = geno, ref.bed = "../geno/GTEx_WGS_838Indiv_Freeze_phased_MAF_0.01_chr1_22_EU",
+                            output.dir = output.dir, var.name = sumstat.comb$variant_id, block.thresh = 0.99)
+
 ```
-
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date.
-
-You can also embed plots, for example:
-
-```{r pressure, echo = FALSE}
-plot(pressure)
-```
-
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub!

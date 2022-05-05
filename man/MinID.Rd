@@ -4,18 +4,38 @@
 \alias{MinID}
 \title{Identification of sharing association}
 \usage{
-MinID(P1, P2, K = 200, F.null = NULL, type = "FWER", alpha = 0.05)
+MinID(
+  P1,
+  P2,
+  type = "FWER",
+  alpha = 0.05,
+  eff.ratio = 0.25,
+  ref.geno = NULL,
+  ref.bed = NULL,
+  block.map = NULL,
+  var.name = NULL,
+  output.dir = "./temp/",
+  simple = T,
+  K = 1000
+)
 }
 \arguments{
-\item{F.null}{null distribution}
+\item{P1}{the input is p-value sequence}
 
 \item{type}{Criteria for the identification}
 
 \item{alpha}{error rate level}
+
+\item{F.null}{null distribution}
 }
 \value{
-
+return is S and tau, where tau is the p-value threshold
 }
 \description{
 Identification of sharing association
+}
+\examples{
+
+
+
 }
