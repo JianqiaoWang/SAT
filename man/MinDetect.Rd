@@ -7,12 +7,6 @@
 MinDetect(P1, P2, K = 200, F.null = NULL)
 }
 \arguments{
-\item{P1}{}
-
-\item{P2}{}
-
-\item{K}{}
-
 \item{F.null}{}
 }
 \value{

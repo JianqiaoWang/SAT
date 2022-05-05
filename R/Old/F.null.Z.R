@@ -35,7 +35,7 @@ bdiag_m <- function(lmat) {
 #' @export
 #'
 #' @examples
-GenZ2 = function(SIGMA.SQRT){
+GenZ = function(SIGMA.SQRT){
 Z = SIGMA.SQRT %*% rnorm(dim(SIGMA.SQRT)[1] ) %>% as.vector()
 }
 #'  Distribution function of |Z| under the null

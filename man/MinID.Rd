@@ -4,7 +4,7 @@
 \alias{MinID}
 \title{Identification of sharing association}
 \usage{
-MinID(P1, P2, K = 200, F.null = NULL, type, alpha)
+MinID(P1, P2, K = 200, F.null = NULL, type = "FWER", alpha = 0.05)
 }
 \arguments{
 \item{F.null}{null distribution}
