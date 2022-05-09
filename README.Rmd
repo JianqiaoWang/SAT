@@ -15,25 +15,46 @@ knitr::opts_chunk$set(
 
 # SAT
 
+
+
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of SAT is to ...
-
-## Installation
-
-You can install the released version of SAT from [CRAN](https://CRAN.R-project.org) with:
-
-``` r
-install.packages("SAT")
-```
-
-And the development version from [GitHub](https://github.com/) with:
-
+The goal of SAT is to detect the shared associated analysis. You can download the development version from [GitHub](https://github.com/) with:
+                  
 ```{r}
 # install.packages("devtools")
 devtools::install_github("JianqiaoWang/SAT")
 ```
+
+
+## Prepare LD matrix with the genotype data. 
+
+Option 1: Prepare data for package bigsnpr and bigstatsr
+
+```{r}
+library(bigsnpr)
+library(bigstatsr)
+rds = bigsnpr::snp_readBed2(bedfile = "../../Cric_HF_RealData/rawdata/cric.filtered.maf0.01.bed",
+                     backingfile = "cric_geno",ind.col= ind.column)
+geno <- snp_attach(rds)
+G <- geno$genotypes
+CHR <- geno$map$chromosome
+infos <- snp_fastImputeSimple(G, method = "mean2")
+# To make this permanent, you need to save (modify) the file on disk
+geno$genotypes <- infos
+geno <- snp_save(geno)
+#G <- geno$genotypes
+#ind.keep <- snp_clumping(G, infos.chr = geno$map$chromosome,
+#                        infos.pos = geno$map$physical.pos,
+#                        thr.r2 = 0.01)
+#saveRDS(ind.keep, file ="ind_keep_clump.rds")
+#data.table::fwrite( as.data.frame(geno$map$marker.ID), file = "snplist.txt")
+
+```
+
+
+
 ## Example
 
 This is a basic example which shows you how to solve a common problem: Independent sequence

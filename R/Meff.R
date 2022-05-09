@@ -1,4 +1,13 @@
-
+#' Detect function for the genotype data
+#'
+#' @param R
+#' @export
+#'
+#' @examples
+#'
+#'
+#'
+#'
 meff <- function(R, eigen, method, ...) {
 
   # match 'method' argument
