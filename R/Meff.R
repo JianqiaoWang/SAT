@@ -1,4 +1,4 @@
-#' Detect function for the genotype data
+#' calculate the effective number
 #'
 #' @param R
 #' @export
