@@ -20,21 +20,20 @@ knitr::opts_chunk$set(
 
 The goal of SAT is to ...
 
-Pre-request package: plink 
-
-
 ## Installation
 
-You can install the development version from [GitHub](https://github.com/) with:
+You can install the released version of SAT from [CRAN](https://CRAN.R-project.org) with:
+
+``` r
+install.packages("SAT")
+```
+
+And the development version from [GitHub](https://github.com/) with:
 
 ```{r}
 # install.packages("devtools")
 devtools::install_github("JianqiaoWang/SAT")
 ```
-
-
-One may also need to install PLINK for block identification, and prepare a suitable reference dataset for the input of the p-value sequence. One commom resource of the reference dataset of the European population for clumping, which is also used in the GRAPPLE paper, is the 1000 genome European reference panel downloaded here http://fileserve.mrcieu.ac.uk/ld/data_maf0.01_rs_ref.tgz, from the MRCIEU cite.
-
 ## Example
 
 This is a basic example which shows you how to solve a common problem: Independent sequence
@@ -53,6 +52,7 @@ T1 = abs(Z1);T2 = abs(Z2);
 P1 = 2* (1 - pnorm( T1)); P2 = 2* (1 - pnorm(T2));
 MinMaxP.simu(P1, P2)
 ```
+
 
 For the typical genetic applications, we consider the LD between the sequences. It requires the additional information of the external LD matrix.  
 

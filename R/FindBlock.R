@@ -1,7 +1,9 @@
 Find.plink.block =  function(snplist, ref.bed, output.dir = "./temp/"){
 # find the block based on the predefined independent LD block
+  if(!is.null(output.dir) ){
   dir.create(output.dir)
   write.csv(snplist ,row.names = F, quote = FALSE, file = paste(output.dir, "target.snplist", sep = ""))
+}
 
   Block.map = data.table::fread("../supp/ld_block_hg19.txt")
   snp.pos =  data.table::fread("../supp/sumstat.pos.b37.txt") %>%
