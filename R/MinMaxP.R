@@ -12,6 +12,101 @@
 #'
 #'
 #'
+#'
+#'
+
+MinMaxP.detect = function(P.max, P.min, M){
+  Tstat = M
+  F_min_M = mean(P.min <= M)
+  I.m = which(P.min <= M)
+  I.m.size = length(I.m)
+  P.min.target =  P.min[I.m]
+  C_0_m = Cmax_null(t = M, P.min = P.min)
+  Pv = 1 - exp(- I.m.size * (M * ( F_min_M - M  ))/ ( (1 - M) * F_min_M ) )
+  PV2 = 1 - exp(- I.m.size * C_0_m )
+  return(c(Pv, PV2) )
+}
+
+#fdr_value = function(x){ Fmax_null(t = x, P.min = P.min)/(1/d+mean(P.max < x))  }
+#fwer_value = function(x){ Cmax_null(t = x, P.min = P.min) * sum(P.min < x)  }
+
+MinMaxP.discov= function(P.max, P.min, method = c("FWER", "FDR"), alpha = 0.05){
+  #--------- decide the range of the cut-off  ---------
+  # step 1: grid search to determine the initial interval to aovid unnecessary computatation
+  d = length(P.min)
+  M = min(P.max)
+  M.choice.0 = sort(exp( log(M) * c(1:10) * 0.1 ))
+  C_0_m = Cmax_null(t = M, P.min = P.min)
+  if(method == "FDR"){ # fdr_value
+    citeria_fun = function(x){ Fmax_null(t = x, P.min = P.min)/(1/d+mean(P.max < x))  }
+  }
+  if(method == "FWER"){ #fwer_value
+    citeria_fun = function(x){ Cmax_null(t = x, P.min = P.min) * sum(P.min < x)  }
+  }
+  citeria_value = sapply(M.choice.0, citeria_fun)
+  #fdr_init = sapply(M.choice.0, function(x){ Fmax_null(t = x, P.min = P.min)/(1/d+mean(P.max < x))  } )
+  #fwer_init = sapply(M.choice.0, function(x){ Cmax_null(t = x, P.min = P.min) * sum(P.min < x)  } )
+
+  # step 2:choose Pmax based on the fdr_init
+  k = min(which(citeria_value > alpha))
+  M.lower = M.choice.0[k]
+  M.upper = max(P.max[P.max <= M.choice.0[k-1]] )
+  M.choice = unique(P.max[P.max < M.lower])
+  M.choice = sort(M.choice[M.choice >= M.upper ]) # now we had a smaller set of M.choice
+  
+  # step 3: elaborate the choice 
+  pv = sapply(M.choice, citeria_fun)
+  tau = max( M.choice[pv <= alpha])
+  S = which(P.max <= tau)
+  return(list(S = S, tau = tau))
+}
+
+Cmax_null = function(t, P.min){
+  Fmin_t = mean(P.min <= t)
+  return( t * ( Fmin_t -  t ) / ( (1 - t)* Fmin_t )  )
+}
+
+Fmax_null = function(t, P.min){
+  Fmin_t = mean(P.min <= t)
+  return( t * ( Fmin_t -  t ) / ( (1 - t))  )
+}
+
+N_eff = function(var.name.target,
+                 ref.geno = NULL,
+                 ref.bed = NULL,
+                 block.map = NULL,
+                 var.name = NULL,
+                 output.dir = "./temp/",
+                 block.thresh = 0.995,
+                 K = 1000,
+                 exact = F){
+  #------------------ read the genotype file ------------------------
+  if(!is.null(ref.geno)){
+    loc.target = match(var.name.target, ref.geno$map$marker.ID)
+    ref.geno = ref.geno$genotypes[,loc.target] %>% as.matrix
+    colnames(ref.geno) = var.name.target
+  }else{
+    
+    if(!is.null(ref.bed)){
+      ref.geno = snpStats::read.plink( bed = ref.bed,
+                                       select.snps = var.name.target )
+      ref.geno = as(ref.geno$genotypes, "numeric")
+    }
+  }
+  #--------------------- define the block list -------------------
+  if(is.null(block.map)){
+    block.list = Find.plink.block(snplist = var.name.target,
+                                  ref.bed = ref.bed,
+                                  output.dir = output.dir)
+  }else{
+    block.list = split(var.name.target, block.map[I.m])
+  }
+  n.block = length(block.list)
+  n.eff = n.eff.vec(ref.geno, block.list, block.thresh = block.thresh)
+  return(n.eff)
+}
+
+
 
 MinMaxP.geno = function(P1, P2,
                    ref.geno = NULL,
@@ -127,7 +222,6 @@ n.eff.vec <- function(ref.geno, block.list, block.thresh){
 }
 
 #------------------------- main function ------------------------
-
 r_to_rho = function(x){
   x = x^2
   y = 0.7723 *x^6 - 1.5659 * x^5 + 1.201* x^4 - 0.2355* x^3 + 0.2184*x^2 + 0.6086*x
@@ -144,6 +238,7 @@ RemoveRedunt = function(corr, block.thresh=0.98){
   return(corr)
 }
 
+# neff calculation
 n.eff.calulate <- function(ref.geno, block.list, thresh = 0.995, colsum = T){
   n.eff = lapply(block.list, function(x){
     if(length(x) == 1){

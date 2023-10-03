@@ -89,7 +89,7 @@ Pv_M_prod = function( M, P.min, eff.ratio, all.len = length(P.min) ){
 }
 
 
-Search.simple = function(P.min, P.max, eff.ratio, type = "FWER", alpha = 0.05){
+Search.simple = function(P.min, P.max, eff.ratio=1, type = "FWER", alpha = 0.05){
   # search with fixed eff.ratio
   # return tau, the max cut-off value satisfying the < alpha
   M = min(P.max)

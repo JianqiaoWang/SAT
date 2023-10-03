@@ -75,6 +75,29 @@ MinMaxP.simu(P1, P2)
 ```
 
 
+
+```{r}
+
+p <- 1*10^5; ## total number of pairs
+d1 = 1000; d2 = 1000; d3 = 100;
+X <- c(rep(0,p-(d1 + d2 + d3)),rep(1,d1),rep(2,d2),rep(3,d3));
+mu.1 = rep(0, p); mu.2 = rep(0, p);
+mu.1[X==1|X==3] = 4; mu.2[X==2|X==3] = 5;
+Z1 <- mu.1 + rnorm(p,0,1);
+Z2 <- mu.2 + rnorm(p,0,1);
+T1 = abs(Z1);T2 = abs(Z2);
+P1 = 2* (1 - pnorm( T1)); P2 = 2* (1 - pnorm(T2));
+P.min = pmin(P1, P2)
+P.max = pmax(P1, P2)
+M = min(P.max)
+MinMaxP.detect(P.min = P.min, P.max = P.max, M)
+MinMaxP.discov(P.max, P.min, method = c("FWER", "FDR"), alpha = 0.05)
+
+
+```
+
+
+
 For the typical genetic applications, we consider the LD between the sequences. It requires the additional information of the external LD matrix.  
 
 ```{r, eval = F}
