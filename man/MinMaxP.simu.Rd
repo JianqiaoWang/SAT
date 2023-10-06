@@ -9,14 +9,6 @@ MinMaxP.simu(P1, P2, var.name = NULL, block.map = NULL, corr = NULL)
 \arguments{
 \item{P2}{}
 }
-\value{
-
-}
 \description{
 general detection function
-}
-\examples{
-
-
-
 }

@@ -9,9 +9,3 @@ meff(R, eigen, method, ...)
 \description{
 calculate the effective number
 }
-\examples{
-
-
-
-
-}
