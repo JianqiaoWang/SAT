@@ -17,9 +17,9 @@ MinMaxP.detect = function(P.max, P.min, M){
   I.m.size = length(I.m)
   P.min.target =  P.min[I.m]
   C_0_m = Cmax_null(t = M, P.min = P.min)
-  Pv = 1 - exp(- I.m.size * (M * ( F_min_M - M  ))/ ( (1 - M) * F_min_M ) )
-  PV2 = 1 - exp(- I.m.size * C_0_m )
-  return(c(Pv, PV2) )
+  #Pv = 1 - exp(- I.m.size * (M * ( F_min_M - M  ))/ ( (1 - M) * F_min_M ) )
+  Pv = 1 - exp(- I.m.size * C_0_m)
+  return(c(Pv = Pv, C_0_m = C_0_m, I.m.size = I.m.size) )
 }
 
 #fdr_value = function(x){ Fmax_null(t = x, P.min = P.min)/(1/d+mean(P.max < x))  }
@@ -57,6 +57,7 @@ MinMaxP.discov= function(P.max, P.min, method = c("FWER", "FDR"), alpha = 0.05){
 
   # step 2:choose Pmax based on the fdr_init
   k = min(which(citeria_value > alpha))
+  if(k ==1){ return(list(S = NULL, tau = M)) }
   M.lower = M.choice.0[k]
   M.upper = max(P.max[P.max <= M.choice.0[k-1]] )
   M.choice = unique(P.max[P.max < M.lower])
