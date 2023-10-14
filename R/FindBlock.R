@@ -1,24 +1,80 @@
-Find.plink.block =  function(snplist, ref.bed, output.dir = "./temp/"){
+#' Find the block by block
+#'
+#' @param snplist
+#' @param CHR
+#' @param BP
+#' @param Block.map
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#'
+#'
+#'
+#'
+#'
+#'
+Find.block.LD =  function(snplist, CHR, BP, CM = NULL, Block.map){
 # find the block based on the predefined independent LD block
-  if(!is.null(output.dir) ){
-  dir.create(output.dir)
-  write.csv(snplist ,row.names = F, quote = FALSE, file = paste(output.dir, "target.snplist", sep = ""))
+
+  #library(data.table)
+
+  # Assuming snp_data and Block.map are already populated
+  snp_data <- data.frame(
+    SNP = snplist,
+    CHR = CHR,
+    POS = BP
+  )
+
+  # Sort snp_data by CHR and POS
+  #setkey(snp_data, CHR, POS)
+
+  # Convert Block.map to a data.table and add an index column
+  Block.map$block_id <- 1:nrow(Block.map)
+
+  # Perform interval join
+  #joined_data <- snp_data[Block.map,
+  #                        nomatch = 0L,
+  #                        on = .(CHR == chr, POS >= start, POS < stop),
+  #                        allow.cartesian=TRUE]
+
+  joined_data <- dplyr::left_join(snp_data, Block.map, dplyr::join_by(CHR == chr, POS >= start, POS < stop ), unmatched = "drop")
+  # Rearrange and clean up the joined result
+  snp_data <- joined_data[, c("SNP", "CHR", "POS", "block_id")]
+
+  #if(FALSE){
+
+#   for(i in 1:nrow(snp_data)){
+#     snp_data$block[i] = which(snp_data$CHR[i] == Block.map$chr &
+#                                (snp_data$POS[i] >= Block.map$start) &
+#                                (snp_data$POS[i] < Block.map$stop))
+#   }
+#  }
+  #
+  # Block.list = split(snp.pos$variant_id, snp.pos$block)
+
+  return(snp_data)
 }
 
-  Block.map = data.table::fread("../supp/ld_block_hg19.txt")
-  snp.pos =  data.table::fread("../supp/sumstat.pos.b37.txt") %>%
-    dplyr::slice(match(snplist, variant_id)) %>%
-    dplyr::arrange(CHR, POS) %>%
-    dplyr::mutate(CHR = paste0("chr",CHR))
-  snp.pos$block = NA
+#' Find the block by the snp distance and position
+#' @export
+Find.block.distance = function(snplist, CHR, BP, CM = NULL, distance_threshold = 500000){
 
-  for(i in 1:nrow(snp.pos)){
-    snp.pos$block[i] = which(snp.pos$CHR[i] == Block.map$chr & (snp.pos$POS[i] >= Block.map$start) & (snp.pos$POS[i] < Block.map$stop))
-  }
+  #determine number of blocks
+  snp_data <- data.frame(
+    SNP = snplist,
+    CHR = CHR,
+    POS = BP
+  )
+  snp_data= snp_data[order(snp_data$CHR, snp_data$POS),]
+  snp_data$POS_diff = snp_data$POS - c(snp_data$POS[1], snp_data$POS[-length(snp_data$POS)] )
+  snp_data$CHR_diff = snp_data$CHR - c(snp_data$CHR[1], snp_data$CHR[-length(snp_data$CHR)] )
+  snp_data$block_incre = pmax( abs(snp_data$POS_diff) > distance_threshold, abs(snp_data$CHR_diff) != 0 )
+  snp_data$block_id = cumsum(snp_data$block_incre)+1
 
-  Block.list = split(snp.pos$variant_id, snp.pos$block)
-
-  return(Block.list)
+  #determine which snp belonging to the block
+  return(snp_data)
 }
 
 Find.plink.block.elaborate =  function(snplist, ref.bed, output.dir = "./temp/"){

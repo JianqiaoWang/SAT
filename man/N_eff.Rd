@@ -2,20 +2,13 @@
 % Please edit documentation in R/Meff.R
 \name{N_eff}
 \alias{N_eff}
-\title{calculate the effective number from a genotype file}
+\title{calculate the effective number of given locations}
 \usage{
-N_eff(
-  var.name.target,
-  ref.geno = NULL,
-  ref.bed = NULL,
-  block.map = NULL,
-  var.name = NULL,
-  output.dir = "./temp/",
-  block.thresh = 0.995,
-  K = 1000,
-  exact = F
-)
+N_eff(block.list, ref.geno = NULL, block.thresh = 0.995)
+}
+\arguments{
+\item{block.map}{}
 }
 \description{
-calculate the effective number from a genotype file
+calculate the effective number of given locations
 }
