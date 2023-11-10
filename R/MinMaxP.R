@@ -71,6 +71,7 @@ MinMaxP.discov= function(P.max, P.min, method = c("FWER", "FDR"), alpha = 0.05){
 }
 
 # utilities function
+#' @export
 Cmax_null = function(t, P.min){
   Fmin_t = mean(P.min <= t)
   return( t * ( Fmin_t -  t ) / ( (1 - t)* Fmin_t )  )
