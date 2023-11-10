@@ -4,7 +4,12 @@
 \alias{N_eff}
 \title{calculate the effective number of given locations}
 \usage{
-N_eff(block.list, ref.geno = NULL, block.thresh = 0.995)
+N_eff(
+  block.list,
+  ref.geno = NULL,
+  block.thresh = 0.995,
+  ind.row = rows_along(ref.geno)
+)
 }
 \arguments{
 \item{block.map}{}

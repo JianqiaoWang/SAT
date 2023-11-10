@@ -14,9 +14,38 @@
 #'
 #'
 #'
-#'
-#'
+N_eff = function(block.list,
+ref.geno = NULL,
+block.thresh = 0.995, ind.row = rows_along(ref.geno) ){
 
+  n.block = length(block.list)
+
+  n.eff = lapply(block.list, function(x){
+    if(length(x) == 1){
+      n.block.eff = 1
+    }else{
+      corr = cor(ref.geno[ind.row,x], use = "pairwise.complete.obs")
+      corr1= r_to_rho(corr)
+      corr1[corr1 < 0] = 0
+      corr1 = RemoveRedunt(corr1,
+                           block.thresh = block.thresh)
+      evs2 = eigen(corr1, only.values = T)$values
+      n.block.eff = meff(eigen = evs2, method = "li2012")
+    }
+    return(data.frame(n.block.eff = n.block.eff) )
+
+  }) %>%  dplyr::bind_rows() %>% colSums()
+
+  return(n.eff)
+}
+
+#' @param Sigma.list
+#' @param ref.geno
+#' @return
+#' @export
+#'
+#' @examples
+#'
 
 N_eff_Sigma = function(Sigma.list,
                  block.thresh = 0.995){
@@ -44,30 +73,6 @@ N_eff_Sigma = function(Sigma.list,
 
 #' @export
 
-N_eff = function(block.list,
-                 ref.geno = NULL,
-                 block.thresh = 0.995){
-
-  n.block = length(block.list)
-
-  n.eff = lapply(block.list, function(x){
-    if(length(x) == 1){
-      n.block.eff = 1
-    }else{
-      corr = cor(ref.geno[,x], use = "pairwise.complete.obs")
-      corr1= r_to_rho(corr)
-      corr1[corr1 < 0] = 0
-      corr1 = RemoveRedunt(corr1,
-                           block.thresh = block.thresh)
-      evs2 = eigen(corr1, only.values = T)$values
-      n.block.eff = meff(eigen = evs2, method = "li2012")
-    }
-    return(data.frame(n.block.eff = n.block.eff) )
-
-  }) %>%  dplyr::bind_rows() %>% colSums()
-
-  return(n.eff)
-}
 
 N_eff_old = function(var.name.target,
                  ref.geno = NULL,
