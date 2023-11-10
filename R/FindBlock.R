@@ -193,6 +193,49 @@ Find.plink.block.original =  function(snplist, ref.bed, output.dir = "./temp/"){
 
 }
 
+Find.block.LD2 =  function(snplist, CHR, BP, CM = NULL, Block.map){
+  # find the block based on the predefined independent LD block
+
+  #library(data.table)
+
+  # Assuming snp_data and Block.map are already populated
+  snp_data <- data.table(
+    SNP = snplist,
+    CHR = CHR,
+    POS = BP
+  )
+
+  # Sort snp_data by CHR and POS
+  setkey(snp_data, CHR, POS)
+
+  # Convert Block.map to a data.table and add an index column
+  Block.map <- as.data.table(Block.map)
+  Block.map$block_id <- 1:nrow(Block.map)
+
+  # Perform interval join
+  joined_data <- snp_data[Block.map,
+                          nomatch = 0L,
+                          on = .(CHR == chr, POS >= start, POS < stop),
+                          allow.cartesian=TRUE]
+
+  # Rearrange and clean up the joined result
+  snp_data <- joined_data[, c("SNP", "CHR", "POS", "block_id")]
+
+  if(FALSE){
+
+    for(i in 1:nrow(snp_data)){
+      snp_data$block[i] = which(snp_data$CHR[i] == Block.map$chr &
+                                  (snp_data$POS[i] >= Block.map$start) &
+                                  (snp_data$POS[i] < Block.map$stop))
+    }
+  }
+  #
+  # Block.list = split(snp.pos$variant_id, snp.pos$block)
+
+  return(snp_data)
+}
+
+
 #
 # GenerateBlock.plink = function(snplist, ref.geno, output.dir){
 #
