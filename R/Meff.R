@@ -25,8 +25,10 @@ N_eff = function(block.list, ref.geno = NULL, block.thresh = 0.995, ind.row = ro
       corr = cor(ref.geno[ind.row,x], use = "pairwise.complete.obs")
       corr1= r_to_rho(corr)
       corr1[corr1 < 0] = 0
+      if(block.thresh < 0.9999){
       corr1 = RemoveRedunt(corr1,
                            block.thresh = block.thresh)
+      }
       evs2 = eigen(corr1, only.values = T)$values
       n.block.eff = meff(eigen = evs2, method = "li2012")
     }

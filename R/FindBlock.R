@@ -59,7 +59,7 @@ Find.block.LD =  function(snplist, CHR, BP, CM = NULL, Block.map){
 
 #' Find the block by the snp distance and position
 #' @export
-Find.block.distance = function(snplist, CHR, BP, CM = NULL, distance_threshold = 500000){
+Find.block.distance = function(snplist, CHR, BP, CM = NULL, POS = NULL, distance_threshold = 500000){
 
   #determine number of blocks
   snp_data <- data.frame(
