@@ -42,7 +42,7 @@ MinMaxP.discov= function(P.max, P.min, method = c("FWER", "FDR"), alpha = 0.05){
   #--------- decide the range of the cut-off  ---------
   # step 1: grid search to determine the initial interval to aovid unnecessary computatation
   d = length(P.min)
-  M = min(P.max)
+  M = max(min(P.max), alpha/(100*d))
   M.choice.0 = sort(exp( log(M) * c(1:10) * 0.1 ))
   C_0_m = Cmax_null(t = M, P.min = P.min)
   if(method == "FDR"){ # fdr_value
