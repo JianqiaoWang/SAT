@@ -167,7 +167,7 @@ MinMaxP.discov2 = function (P.max, P.min, method = c("FWER", "FDR"), alpha = 0.0
 
 #' @export
 MinMaxP.geno.detect = function(P1, P2, bdist = "CM", dist_thresh = 0.5, geno = NULL, ind.row){
-
+  # require the matched ID between geno and (P1, P2)
   P.max = pmax(df$P1, df$P2)
   P.min = pmin(df$P1, df$P2)
   M = min(P.max)
