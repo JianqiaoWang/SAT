@@ -3,67 +3,84 @@
 #' @param P.max
 #' @param P.min
 #' @param M
-#'
-#' @return detection pvalue
-#'
+#' @return a list of detection p-value and testing multiplicity
 #' @export
 #'
 #' @examples
+#' p <- 1*10^5; d1 = 100; d2 = 100; d3 = 0;  ## total number of pairs
+#' X <- c(rep(0,p-(d1 + d2 + d3)),rep(1,d1),rep(2,d2),rep(3,d3));
+#' Z1 <- rnorm(p,0,1); Z1[X==1|X==3] <- rnorm(d1+d3,4,1);
+#' Z2 <- rnorm(p,0,1); Z2[X==2|X==3] <- rnorm(d2+d3,5,1);
+#' P1 = 2* (1 - pnorm( abs(Z1) )); P2 = 2* (1 - pnorm(abs(Z2)));
+#' P.min = pmin(P1, P2)
+#' P.max = pmax(P1, P2)
+#' M = min(P.max)
+#' MinMaxP.detect(P.max, P.min, M)
 
 MinMaxP.detect = function(P.max, P.min, M){
   Tstat = M
   F_min_M = mean(P.min <= M)
   I.m = which(P.min <= M)
-  I.m.size = length(I.m)
-  P.min.target =  P.min[I.m]
-  C_0_m = Cmax_null(t = M, P.min = P.min)
-  #Pv = 1 - exp(- I.m.size * (M * ( F_min_M - M  ))/ ( (1 - M) * F_min_M ) )
+  I.m.size = length(I.m) # testing multiplicity
+  C_0_m = Cmax_null(t = M, P.min = P.min) # conditional distribution function
   Pv = 1 - exp(- I.m.size * C_0_m)
-  return(c(Pv = Pv, C_0_m = C_0_m, I.m = I.m) )
+  return(list(Pv = Pv,  I.m = I.m.size) )
 }
 
-#fdr_value = function(x){ Fmax_null(t = x, P.min = P.min)/(1/d+mean(P.max < x))  }
-#fwer_value = function(x){ Cmax_null(t = x, P.min = P.min) * sum(P.min < x)  }
 
-#' Detect function for the genotype data
+#' colocalized signals discovery for the genotype data
 #'
 #' @param P.max
 #' @param P.min
 #' @param alpha # significance value
 #' @param method # FWER and FDR
 #'
-#' @return detection pvalue
+#' @return the discovery set and discover cut-off
 #'
 #' @export
 #'
 #' @examples
+#' p <- 1*10^5; d1 = 100; d2 = 100; d3 = 10;  ## total number of pairs
+#' X <- c(rep(0,p-(d1 + d2 + d3)),rep(1,d1),rep(2,d2),rep(3,d3));
+#' Z1 <- rnorm(p,0,1); Z1[X==1|X==3] <- rnorm(d1+d3,4,1);
+#' Z2 <- rnorm(p,0,1); Z2[X==2|X==3] <- rnorm(d2+d3,5,1);
+#' P1 = 2* (1 - pnorm( abs(Z1) )); P2 = 2* (1 - pnorm(abs(Z2)));
+#' P.min = pmin(P1, P2)
+#' P.max = pmax(P1, P2)
+#' M = min(P.max)
+#' MinMaxP.discov(P.max, P.min, method = "FWER", alpha = 0.05)
+#' MinMaxP.discov(P.max, P.min, method = "FDR", alpha = 0.05)
 
 MinMaxP.discov= function(P.max, P.min, method = c("FWER", "FDR"), alpha = 0.05){
+  #fdr_value = function(x){ Fmax_null(t = x, P.min = P.min)/(1/d+mean(P.max < x))  }
+  #fwer_value = function(x){ Cmax_null(t = x, P.min = P.min) * sum(P.min < x)  }
   #--------- decide the range of the cut-off  ---------
   # step 1: grid search to determine the initial interval to aovid unnecessary computatation
   d = length(P.min)
   M = max(min(P.max), alpha/(100*d))
   M.choice.0 = sort(exp( log(M) * c(1:10) * 0.1 ))
   C_0_m = Cmax_null(t = M, P.min = P.min)
-  if(method == "FDR"){ # fdr_value
-    citeria_fun = function(x){ Fmax_null(t = x, P.min = P.min)/(1/d+mean(P.max < x))  }
+  if(method == "FDR"){ # fdr_value based on the ratio of conditional null and observed
+    citeria_fun = function(x){ Fmax_null(t = x, P.min = P.min)/( max(1, sum(P.max < x))/d  )  }
   }
-  if(method == "FWER"){ #fwer_value
+  if(method == "FWER"){ #fwer_value based on the conditional null distribution
     citeria_fun = function(x){ Cmax_null(t = x, P.min = P.min) * sum(P.min < x)  }
   }
   citeria_value = sapply(M.choice.0, citeria_fun)
-  #fdr_init = sapply(M.choice.0, function(x){ Fmax_null(t = x, P.min = P.min)/(1/d+mean(P.max < x))  } )
-  #fwer_init = sapply(M.choice.0, function(x){ Cmax_null(t = x, P.min = P.min) * sum(P.min < x)  } )
+
 
   # step 2:choose Pmax based on the fdr_init
   k = min(which(citeria_value > alpha))
-  if(k ==1){ return(list(S = NULL, tau = M)) }
+  if(k ==1){
+    message("no discovery; check the detection p-value")
+    return(list(S = NULL, tau = NULL))
+  }
   M.lower = M.choice.0[k]
   M.upper = max(P.max[P.max <= M.choice.0[k-1]] )
   M.choice = unique(P.max[P.max < M.lower])
   M.choice = sort(M.choice[M.choice >= M.upper ]) # now we had a smaller set of M.choice
 
-  # step 3: elaborate the choice
+  # step 3: elaborate the cut-off choice
   pv = sapply(M.choice, citeria_fun)
   tau = max( M.choice[pv <= alpha])
   S = which(P.max <= tau)
@@ -77,134 +94,12 @@ Cmax_null = function(t, P.min){
   return( t * ( Fmin_t -  t ) / ( (1 - t)* Fmin_t )  )
 }
 
+# utilities function
+#' @export
 Fmax_null = function(t, P.min){
   Fmin_t = mean(P.min <= t)
   return( t * ( Fmin_t -  t ) / ( (1 - t))  )
 }
-
-MinMaxP.discov2 = function (P.max, P.min, method = c("FWER", "FDR"), alpha = 0.05)
-{
-  d = length(P.min)
-  M = min(P.max)
-
-  if (method == "FDR") {
-    critFunc = function(x) {
-      SAT:::Fmax_null(t = x, P.min = P.min)/(1/d + mean(P.max < x))
-    }
-  }else if(method == "FWER"){
-    citeria_fun = function(x){ Cmax_null(t = x, P.min = P.min) * sum(P.min < x)  }
-  }else{
-    stop("Invalid method specified")
-  }
-
-  # we first narrow down the searching interval
-  first_cutoff <- NA
-  cutoff.choice.0 = sort( c( exp(log(M) * c(1:10) * 0.1), 1) )
-  for(k in 1: length(cutoff.choice.0) ){
-    criteria_value = critFunc( cutoff.choice.0[k] )
-    if( criteria_value > alpha){
-      first_cutoff <- cutoff.choice.0[k]
-      break
-    }
-  }
-
-  if (k == 1) {
-    return(list(S = NULL, tau = M))
-  }
-  if (is.na(first_cutoff)) {
-    print("No suitable cutoff found where criteria function exceeds alpha")
-    return(list(S = NULL, tau = M))
-  }
-
-  # Bisection search to find the root for largest p such that c(p) <= alpha
-  cutoff.upper = cutoff.choice.0[k]
-  cutoff.lower = max(P.max[P.max <= cutoff.choice.0[k - 1]]) # we have to guarrantte that there exists a p-value achieving the lower
-  cutoff_values <- sort(unique(P.max[P.max >= cutoff.lower & P.max <= cutoff.upper]))
-  low <- 1; high <- length(cutoff_values)
-  largest_cutoff <- NA  # Initialize largest_cutoff
-
-  if(critFunc(cutoff_values[high]) <= alpha){
-    largest_cutoff <- cutoff_values[high]
-  }else{
-    # Bisection search loop
-    while (low <= high) {
-      mid <- low + (high - low) %/% 2  # Find the middle index
-      # Check the criteria function at the midpoint
-      if (critFunc(cutoff_values[mid]) <= alpha) {
-        largest_cutoff <- cutoff_values[mid]  # Update largest_cutoff if condition is met
-        low <- mid + 1  # Move to the right half of the array
-      } else{
-        high <- mid - 1  # Move to the left half of the array
-      }
-    }
-  }
-
-  if(F){
-    # due to the non-monotone of FDP, grid search for mid + 2, add one more BS
-    low =  mid+2
-    high = length(cutoff_values)
-    if( low <= high & (critFunc(cutoff_values[low]) <= alpha) ){
-      while (low <= high) {
-        mid <- low + (high - low) %/% 2
-        if (critFunc(cutoff_values[mid]) <= alpha){
-          largest_cutoff <- cutoff_values[mid]  # Update largest_cutoff if condition is met
-          low <- mid + 1  # Move to the right half of the array
-        }else{
-          high <- mid - 1  # Move to the left half of the array
-        }
-      }
-    }
-  }
-
-  # sapply(cutoff_values,  critFunc)
-  #sapply(cutoff.choice.0,  critFunc)
-
-  tau = largest_cutoff
-  S = which(P.max <= tau)
-  return(list(S = S, tau = tau))
-}
-
-
-#' @export
-MinMaxP.geno.detect = function(P1, P2, bdist = "CM", dist_thresh = 0.5, geno = NULL, ind.row){
-  # require the matched ID between geno and (P1, P2)
-  P.max = pmax(df$P1, df$P2)
-  P.min = pmin(df$P1, df$P2)
-  M = min(P.max)
-  p.stat = MinMaxP.detect(P.max = P.max, P.min = P.min, M = M)
-  p.vec = p.stat["Pv"]
-  I.m = p.stat["I.m"]
-  if(bdist == "CM" ){
-    snp_info = Find.block.distance(snplist = geno$map$marker.ID[I.m],
-                                   CHR = geno$map$chromosome[I.m],
-                                   BP = geno$map$genetic.dist[I.m],
-                                   distance_threshold = dist_thresh)
-  }
-
-  if(bdist == "BP"){
-    snp_info = Find.block.distance(snplist = geno$map$marker.ID[I.m],
-                                   CHR = geno$map$chromosome[I.m],
-                                   BP = geno$map$physical.pos[I.m],
-                                   distance_threshold = dist_thresh)
-  }
-  snp_info$ref_index =   match(snp_info$SNP, geno$map$marker.ID)
-  Block.ref.list = split(snp_info$ref_index, snp_info$block_id)
-
-  Sigma.list = lapply(Block.ref.list, function(x){
-    if(length(x) == 1){
-      return(1)
-    }else{
-      cor(geno$genotypes[ind.row,x], use = "pairwise.complete.obs")
-    }
-  } )
-  neff_vec = N_eff_Sigma(Sigma.list, block.thresh = 1 )
-  p.vec.dep = 1 - exp(- neff_vec * p.stat["C_0_m"])
-  return(c(p.vec.dep, neff_vec))
-}
-
-#' @export
-
-
 
 #
 # MinMaxP.geno = function(P1, P2,

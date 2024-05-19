@@ -4,7 +4,14 @@
 \alias{Find.block.distance}
 \title{Find the block by the snp distance and position}
 \usage{
-Find.block.distance(snplist, CHR, BP, CM = NULL, distance_threshold = 5e+05)
+Find.block.distance(
+  snplist,
+  CHR,
+  BP,
+  CM = NULL,
+  POS = NULL,
+  distance_threshold = 5e+05
+)
 }
 \description{
 Find the block by the snp distance and position

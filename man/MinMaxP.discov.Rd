@@ -2,7 +2,7 @@
 % Please edit documentation in R/MinMaxP.R
 \name{MinMaxP.discov}
 \alias{MinMaxP.discov}
-\title{Detect function for the genotype data}
+\title{colocalized signals discovery for the genotype data}
 \usage{
 MinMaxP.discov(P.max, P.min, method = c("FWER", "FDR"), alpha = 0.05)
 }
@@ -12,8 +12,20 @@ MinMaxP.discov(P.max, P.min, method = c("FWER", "FDR"), alpha = 0.05)
 \item{alpha}{significance value}
 }
 \value{
-detection pvalue
+the discovery set and discover cut-off
 }
 \description{
-Detect function for the genotype data
+colocalized signals discovery for the genotype data
+}
+\examples{
+p <- 1*10^5; d1 = 100; d2 = 100; d3 = 10;  ## total number of pairs
+X <- c(rep(0,p-(d1 + d2 + d3)),rep(1,d1),rep(2,d2),rep(3,d3));
+Z1 <- rnorm(p,0,1); Z1[X==1|X==3] <- rnorm(d1+d3,4,1);
+Z2 <- rnorm(p,0,1); Z2[X==2|X==3] <- rnorm(d2+d3,5,1);
+P1 = 2* (1 - pnorm( abs(Z1) )); P2 = 2* (1 - pnorm(abs(Z2)));
+P.min = pmin(P1, P2)
+P.max = pmax(P1, P2)
+M = min(P.max)
+MinMaxP.discov(P.max, P.min, method = "FWER", alpha = 0.05)
+MinMaxP.discov(P.max, P.min, method = "FDR", alpha = 0.05)
 }

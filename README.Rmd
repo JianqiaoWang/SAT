@@ -91,8 +91,15 @@ P.min = pmin(P1, P2)
 P.max = pmax(P1, P2)
 M = min(P.max)
 MinMaxP.detect(P.min = P.min, P.max = P.max, M)
-MinMaxP.discov(P.max, P.min, method = c("FWER", "FDR"), alpha = 0.05)
+MinMaxP.discov(P.max, P.min, method = c("FDR"), alpha = 0.05)
 
+MinMaxP.discov(P.max, P.min, method = c("FWER"), alpha = 0.05)
+
+P.tilde =sapply(P.max, function(x) {Cmax_null(x, P.min ) })
+
+P.fdr = p.adjust(P.tilde, "BH")
+
+which(P.fdr < 0.05)
 
 ```
 

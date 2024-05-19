@@ -6,12 +6,20 @@
 \usage{
 MinMaxP.detect(P.max, P.min, M)
 }
-\arguments{
-\item{M}{}
-}
 \value{
-detection pvalue
+a list of detection p-value and testing multiplicity
 }
 \description{
 Detect function for the genotype data
+}
+\examples{
+p <- 1*10^5; d1 = 100; d2 = 100; d3 = 0;  ## total number of pairs
+X <- c(rep(0,p-(d1 + d2 + d3)),rep(1,d1),rep(2,d2),rep(3,d3));
+Z1 <- rnorm(p,0,1); Z1[X==1|X==3] <- rnorm(d1+d3,4,1);
+Z2 <- rnorm(p,0,1); Z2[X==2|X==3] <- rnorm(d2+d3,5,1);
+P1 = 2* (1 - pnorm( abs(Z1) )); P2 = 2* (1 - pnorm(abs(Z2)));
+P.min = pmin(P1, P2)
+P.max = pmax(P1, P2)
+M = min(P.max)
+MinMaxP.detect(P.max, P.min, M)
 }
